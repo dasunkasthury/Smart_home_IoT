@@ -1,15 +1,3 @@
-// Example of drawing a graphical "switch" and using
-// the touch screen to change it's state.
-
-// This sketch does not use the libraries button drawing
-// and handling functions.
-
-// Based on Adafruit_GFX library onoffbutton example.
-
-// Touch handling for XPT2046 based screens is handled by
-// the TFT_eSPI library.
-
-// Calibration data is stored in SPIFFS so we need to include it
 #include "FS.h"
 #include <Arduino.h>
 
@@ -56,7 +44,7 @@ bool SwitchOn = false;
 #define GREENBUTTON_H FRAME_H
 
 #define WIFI_SSID "DK_MAX"
-#define WIFI_PASSWORD "$@mpatha_637-208511"
+#define WIFI_PASSWORD "$@mpatha_637-"
 #define API_KEY "AIzaSyBWxCAsEJW5umn9ypxTVVKghVQxgv1zifQ";
 #define DATABASE_URL "https://esp32-home-932a5-default-rtdb.asia-southeast1.firebasedatabase.app/";
 #define USER_EMAIL "dasunkasthury@gmail.com";
@@ -84,8 +72,6 @@ void setMood(String mood);
 // Function prototype for colorWipe
 void colorWipe(uint32_t color, int wait);
 
-//------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------
 void setup(void)
 {
   Serial.begin(921600);
@@ -113,10 +99,6 @@ void setup(void)
   tft.fillScreen(TFT_BLUE);
 
   tft.fillRect(100, 50, 20, 30, TFT_MAGENTA);
-
-  // tft.setTextSize(3);
-  // tft.println("This is Your Mood");
-  // setMood("Noo");
 
   // Draw button (this example does not use library Button class)
   redBtn();
@@ -146,8 +128,7 @@ void setup(void)
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
 }
-//------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------
+
 void loop()
 {
   uint16_t x, y;
@@ -191,47 +172,37 @@ void loop()
     sendDataPreMillis = millis();
 
     String mood = "INIT";
-    int red_value = Firebase.RTDB.getInt(&fbdo, "/led/Red", &red_value) ? red_value : 0;
-    int blue_value = Firebase.RTDB.getInt(&fbdo, "/led/Blue", &blue_value) ? blue_value : 0;
-    int green_value = Firebase.RTDB.getInt(&fbdo, "/led/Green", &green_value) ? green_value : 0;
-    int ledBright = Firebase.RTDB.getInt(&fbdo, "/led/bright", &ledBright) ? ledBright : 100;
+    // int red_value = Firebase.RTDB.getInt(&fbdo, "/led/Red", &red_value) ? red_value : 0;
+    // int blue_value = Firebase.RTDB.getInt(&fbdo, "/led/Blue", &blue_value) ? blue_value : 0;
+    // int green_value = Firebase.RTDB.getInt(&fbdo, "/led/Green", &green_value) ? green_value : 0;
+    // int ledBright = Firebase.RTDB.getInt(&fbdo, "/led/bright", &ledBright) ? ledBright : 100;
+    int roomBrightness = Firebase.RTDB.getInt(&fbdo, "/led/room_brightness", &roomBrightness) ? roomBrightness : 100;
     mood = Firebase.RTDB.getString(&fbdo, "/led/mood", &mood) ? mood : "";
     Firebase.RTDB.getBool(&fbdo, "/led/state", &oldStateValue);
-
     setMood(mood);
 
-    // if (showMode)
-    // {
-    //   Serial.println("mood ---------------------------------------");
-    //   Serial.println(mood);
-    //   Serial.println("mood  END---------------------------------------");
-    //   setMood(mood);
-    //   showMode = false;
-    // }
+    // rules to suggest the brightness
+    if (oldStateValue)
+      if (mood == "happy" && roomBrightness < 1000)
+      {
+        Firebase.RTDB.setInt(&fbdo, "/led/bright", 255);
+        strip.setBrightness(roomBrightness);
+        colorWipe(strip.Color(255, 0, 0), 50);
+      }
+      else if (mood == "sad" && roomBrightness > 500)
+      {
+        Firebase.RTDB.setInt(&fbdo, "/led/bright", 50);
+        strip.setBrightness(roomBrightness);
+        colorWipe(strip.Color(0, 255, 0), 50);
+      }
 
     if (oldStateValue != SwitchOn)
     {
       bool isSuccess = Firebase.RTDB.setBool(&fbdo, "/led/state", SwitchOn ? 1 : 0);
       oldStateValue = isSuccess ? SwitchOn : oldStateValue;
     }
-
-    int ledState;
-    if (true)
-    {
-      digitalWrite(LED_BUILTIN, ledState);
-      // Serial.println(ledState);
-      // Serial.print("LED ON ");
-      // Serial.println();
-      strip.setBrightness(ledBright);
-      colorWipe(strip.Color(red_value, green_value, blue_value), 50);
-    }
-    else
-    {
-      Serial.println(fbdo.errorReason().c_str());
-    }
   }
 }
-//------------------------------------------------------------------------------------------
 
 void touch_calibrate()
 {
@@ -345,10 +316,10 @@ void setMood(String mood)
     tft.fillRect(0, 0, 320, 100, TFT_BLACK); // 320 * 240
     tft.setCursor(0, 0);
     tft.setTextSize(3);
-    tft.println("Is Your Mood");
-    tft.setCursor(100, 40);
-    tft.setTextSize(5);
-    tft.print(myString);
+    tft.println("Are You " + myString);
+    tft.setCursor(0, 40);
+    tft.setTextSize(3);
+    tft.print("would you like to change the room brightness?");
     oldMood = mood;
     redBtn();
   }
