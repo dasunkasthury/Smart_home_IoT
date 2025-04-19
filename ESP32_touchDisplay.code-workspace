@@ -1,0 +1,16 @@
+{
+  "folders": [
+	{
+		"path": "../ESP32_touchDisplay"
+	},
+	{
+		"name": "ESP32_touchDisplay",
+		"path": "../ESP32_touchDisplay/ESP32_touchDisplay"
+	},
+	{
+		"name": "Esp32_smart_home",
+		"path": "."
+	}
+],
+  "settings": {}
+}

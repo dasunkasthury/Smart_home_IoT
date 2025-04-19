@@ -1,0 +1,61 @@
+This directory is intended for project specific (private) libraries.
+PlatformIO will compile them to static libraries and link into executable file.
+
+The source code of each library should be placed in an own separate directory
+("lib/your_library_name/[here are source files]").
+
+For example, see a structure of the following two libraries `Foo` and `Bar`:
+
+|--lib
+| |
+| |--Bar
+| | |--docs
+| | |--examples
+| | |--src
+| | |- Bar.c
+| | |- Bar.h
+| | |- library.json (optional, custom build options, etc) https://docs.platformio.org/page/librarymanager/config.html
+| |
+| |--Foo
+| | |- Foo.c
+| | |- Foo.h
+| |
+| |- README --> THIS FILE
+|
+|- platformio.ini
+|--src
+|- main.c
+
+and a contents of `src/main.c`:
+
+```
+#include <Foo.h>
+#include <Bar.h>
+
+int main (void)
+{
+  ...
+}
+
+```
+
+PlatformIO Library Dependency Finder will find automatically dependent
+libraries scanning project source files.
+
+More information about PlatformIO Library Dependency Finder
+
+- https://docs.platformio.org/page/librarymanager/ldf.html
+
+Steps -
+Navigate to .pio\libdeps\nodemcu-32s\TFT_eSPI\User_Setup_Select.h
+Comment out #include <User_Setup.h> // Default setup is root library folder
+Uncomment #include <User_Setups/Setup42_ILI9341_ESP32.h> // Setup file for ESP32 and SPI ILI9341 240x320
+Navigate to .pio\libdeps\nodemcu-32s\TFT_eSPI\User_Setups\Setup42_ILI9341_ESP32.h
+Uncomment #define TOUCH_CS 33 // Chip select pin (T_CS) of touch screen and modify like this
+Modify like below
+#define TFT_MISO 19 // (leave TFT SDO disconnected if other SPI devices share MISO)
+#define TFT_MOSI 23
+#define TFT_SCLK 18
+#define TFT_CS 15 // Chip select control pin
+#define TFT_DC 4 // Data Command control pin
+#define TFT_RST 27 // Reset pin (could connect to RST pin)
